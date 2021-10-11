@@ -7,7 +7,7 @@ let topic = 'ucast';
 
 const map = L.map('obce_rozdily_mapa', { scrollWheelZoom: false });
 const bg = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a target="_blank" href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, data <a target="_blank" href="https://www.uzis.cz/">ÚZIS k 24. 7. 2021</a>',
+  attribution: '&copy; <a target="_blank" href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, data <a target="_blank" href="https://www.volby.cz/">ČSÚ</a>',
   subdomains: 'abcd',
   maxZoom: 15,
 });
@@ -24,11 +24,11 @@ legend.onAdd = function (map) {
 };
 
 function makeLegend(topic) {
-  const br = brks(topic)
+  const br = brks(topic);
   return `<i style="background:#b2182b"></i>> ${Math.round(br[3] * 1000) / 10} p.b.<br>`
     + `<i style="background:#ef8a62"></i>< ${Math.round(br[2] * 1000) / 10} p.b.<br>`
     + `<i style="background:#fddbc7"></i>< ${Math.round(br[1] * 1000) / 10} p.b.<br>`
-    + `<i style="background:#67a9cf"></i>< ${Math.round(br[0] * 1000) / 10} p.b.<br>`
+    + `<i style="background:#67a9cf"></i>< ${Math.round(br[0] * 1000) / 10} p.b.<br>`;
 }
 
 legend.addTo(map);
@@ -55,20 +55,16 @@ L.topoJson = function (data, options) {
   return new L.TopoJSON(data, options);
 };
 
-function getPct(p, c) {
-  return Math.round((p / c) * 1000) / 10;
-}
-
 function brks(topic) {
   if (topic === 'ucast') {
-    return [-0.02, 0, 0.05, 0.07]
+    return [-0.02, 0, 0.05, 0.07];
   }
-  return [-0.25, -0.1, 0, 0.1]
+  return [-0.25, -0.1, 0, 0.1];
 }
 
 function getCol(oid, topic) {
-  const val = data[oid][topic][1] * -1
-  const br = brks(topic)
+  const val = data[oid][topic][1] * -1;
+  const br = brks(topic);
   if (val <= br[0]) { return '#0571b0'; }
   if (val <= br[1]) { return '#92c5de'; }
   if (val <= br[2]) { return '#e0f3f8'; }
@@ -77,16 +73,14 @@ function getCol(oid, topic) {
   return 'lightgray';
 }
 
-
-
 const topics = {
-  'cssd': 'ČSSD',
-  'ano': 'ANO',
-  'spolu': 'SPOLU',
-  'spd': 'SPD',
-  'ksc': 'KSČM',
-  'pirstan': 'Piráti+STAN',
-}
+  cssd: 'ČSSD',
+  ano: 'ANO',
+  spolu: 'SPOLU',
+  spd: 'SPD',
+  ksc: 'KSČM',
+  pirstan: 'Piráti+STAN',
+};
 
 const geojson = L.topoJson(null, {
   style(feature) {
@@ -101,10 +95,10 @@ const geojson = L.topoJson(null, {
   },
   onEachFeature(feature, layer) {
     layer.on('click', (e) => {
-      const d = data[e.target.feature.properties.kod]
-      let wording = 'v účasti'
+      const d = data[e.target.feature.properties.kod];
+      let wording = 'v účasti';
       if (topic !== 'ucast') {
-        wording = 've výsledku ' + topics[topic]
+        wording = `ve výsledku ${topics[topic]}`;
       }
       layer.bindPopup(
         `<b>${e.target.feature.properties.nazev}</b><br>změna ${wording} mezi 2017 a 2021: ${Math.round(d[topic][1] * -1000) / 10} p.b. (${d[topic][0] * -1} osob)`,
@@ -116,12 +110,12 @@ const geojson = L.topoJson(null, {
 geojson.addTo(map);
 
 let data = null;
-fetch(host + '/js/mapa.json')
-  .then(response => response.json())
-  .then(mapdata => {
-    fetch(host + '/js/data.json')
-      .then(res => res.json())
-      .then(da => {
+fetch(`${host}/js/mapa.json`)
+  .then((response) => response.json())
+  .then((mapdata) => {
+    fetch(`${host}/js/data.json`)
+      .then((res) => res.json())
+      .then((da) => {
         data = da;
         const dkeys = Object.keys(data);
         mapdata.objects.xxx.geometries = mapdata.objects.xxx.geometries.filter((ob) => {
@@ -132,27 +126,25 @@ fetch(host + '/js/mapa.json')
         });
         geojson.addData(mapdata);
         map.fitBounds(geojson.getBounds());
-      })
+      });
   });
 
-
-const sel = document.getElementById('topic')
+const sel = document.getElementById('topic');
 if (sel !== null) {
   sel.addEventListener('change', (e) => {
     topic = e.target.value;
-    reDraw(topic)
-  })
+    reDraw(topic);
+  });
 }
-
 
 function reDraw(topic) {
   geojson.eachLayer((layer) => {
-    layer.setStyle({ 'fillColor': getCol(layer.feature.properties.kod, topic) })
-  })
+    layer.setStyle({ fillColor: getCol(layer.feature.properties.kod, topic) });
+  });
   // update legendy
-  const leg = document.getElementsByClassName('info legend')[0]
-  const br = brks(topic)
-  leg.innerHTML = makeLegend(topic)
+  const leg = document.getElementsByClassName('info legend')[0];
+  const br = brks(topic);
+  leg.innerHTML = makeLegend(topic);
 }
 
 // geocoder
