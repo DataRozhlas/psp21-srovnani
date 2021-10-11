@@ -3,7 +3,7 @@ if (window.location.hostname === 'localhost') {
   host = 'http://localhost/psp21-srovnani';
 }
 
-let topic = 'ucast';
+let topic = 'spolu';
 
 const map = L.map('obce_rozdily_mapa', { scrollWheelZoom: false });
 const bg = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
