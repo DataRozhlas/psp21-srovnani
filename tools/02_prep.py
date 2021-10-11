@@ -59,11 +59,13 @@ for ob in d21:
 # %%¨
 len(out)
 # %%
-xi = pd.DataFrame.from_dict(out, orient='index').applymap(
-    lambda x: x[1]).ucast.to_dict()
+d = pd.DataFrame.from_dict(out, orient='index').applymap(
+    lambda x: x[1] * -100)
 # %%
 with open('../js/data.js', 'w', encoding='utf-8') as f:
     f.write('export const data = ' + json.dumps(out, ensure_ascii=False) + ';')
 # %%
-xi
+d[d.columns[:-1]].mean(axis=1).describe()
+# %%
+d[d.columns[:-1]].describe()
 # %%
