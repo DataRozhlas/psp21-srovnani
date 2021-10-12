@@ -4,6 +4,15 @@ if (window.location.hostname === 'localhost') {
 }
 
 let topic = 'spolu';
+const sel = document.getElementById('topic');
+if (sel !== null) {
+  sel.addEventListener('change', (e) => {
+    topic = e.target.value;
+    reDraw(topic);
+  });
+} else {
+  topic = 'ucast';
+}
 
 const map = L.map('obce_rozdily_mapa', { scrollWheelZoom: false });
 const bg = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
@@ -128,14 +137,6 @@ fetch(`${host}/js/mapa.json`)
         map.fitBounds(geojson.getBounds());
       });
   });
-
-const sel = document.getElementById('topic');
-if (sel !== null) {
-  sel.addEventListener('change', (e) => {
-    topic = e.target.value;
-    reDraw(topic);
-  });
-}
 
 function reDraw(topic) {
   geojson.eachLayer((layer) => {
